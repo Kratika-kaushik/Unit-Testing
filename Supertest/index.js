@@ -1,22 +1,53 @@
-const express=require('express')
-const app=express()
+const express = require('express')
+const app = express()
 app.use(express.json())
 
-app.get("/users",(req,res)=>{
+const fakeDB = [
+    {
+        id: Math.floor(Math.random() * 100),
+        email: "test@example.com",
+    },
+];
+
+app.get("/users", (req, res) => {
     res.status(200).json({
-        users:[
+        users: [
             {
-                name:'qwer',
-                password:'qwerrrrrrrrrr'
+                name: 'qwer',
+                password: 'qwerrrrrrrrrr'
             }
         ]
     })
 })
-app.listen(3000)
 
-// fastify.listen({port:3000},(err, address) => {
-//     if (err) throw err
-//     console.log(`Server is now listening on ${address}`); 
-// })
 
-module.exports=app
+
+app.get("/", (req, res) => {
+    return res.status(200).json({ data: fakeDB });
+});
+
+
+app.post("/send", (req, res) => {
+    fakeDB.push({
+        id: Math.floor(Math.random() * 100),
+        email: req.body.email,
+    });
+    return res.status(201).json({ data: fakeDB });
+});
+
+
+app.put("/update/:id", (req, res) => {
+    const obj = fakeDB.find((el) => el.id === Number(req.params.id));
+    obj.email = req.body.email;
+    return res.status(200).json({ data: fakeDB });
+});
+
+app.delete("/destroy/:id", (req, res) => {
+    const i = fakeDB.findIndex((el) => el.id === Number(req.params.id));
+    fakeDB.splice(i, 1);
+    return res.status(200).json({ data: fakeDB });
+});
+
+
+
+module.exports = app
